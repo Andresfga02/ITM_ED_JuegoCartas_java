@@ -30,10 +30,6 @@ public class FrmJuego extends JFrame { //Se le agrega el extends ya que se quier
         btnVerificar.setBounds(120,10,100,25);
         getContentPane().add(btnVerificar);
 
-        JButton btnCalcularPuntaje = new JButton("Cálcular Puntaje");
-        btnCalcularPuntaje.setBounds(230,10,130,25);
-        getContentPane().add(btnCalcularPuntaje);
-
         //Definicion de pestañas
         tpJugadores = new JTabbedPane();
         tpJugadores.setBounds(10,40,650,150);
@@ -68,13 +64,6 @@ public class FrmJuego extends JFrame { //Se le agrega el extends ya que se quier
                 verificarJugador();
             }
         });
-
-        btnCalcularPuntaje.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                calcularPuntaje();
-            }
-        });
     }
 
     Jugador jugador1 = new Jugador();
@@ -101,24 +90,5 @@ public class FrmJuego extends JFrame { //Se le agrega el extends ya que se quier
             default:
                 break;
         }
-
     }
-
-    //----------------------------------------------------------------
-    
-    private void calcularPuntaje() {
-        int pestana = tpJugadores.getSelectedIndex();
-
-        int puntaje = 0;
-        switch(pestana){
-            case 0:
-                puntaje = jugador1.calcularPuntaje();
-                break;
-            case 1:
-                puntaje = jugador2.calcularPuntaje();
-                break;   
-        }
-        JOptionPane.showMessageDialog(null, "Puntaje del jugador: " + puntaje);
-    }
-    
 }

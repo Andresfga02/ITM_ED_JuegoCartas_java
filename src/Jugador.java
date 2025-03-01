@@ -68,79 +68,90 @@ public class Jugador {
         return mensaje;
     }
 
-    int puntajeARestar = 0;
+    int puntajeTotal = 0;
     public String getEscaleras() {
-
         String mensaje = MENSAJE_ESCALERAS;
-
+    
         for (Pinta pinta : Pinta.values()) {
-
             boolean[] cartasEnEscalera = new boolean[NombreCarta.values().length];
             boolean escaleraEncontrada = false;
-
+            String escaleraActual = "";
+    
             for (NombreCarta nombre : NombreCarta.values()) {
-
-                int contador = 0;
-
                 for (int i = 0; i < 10; i++) {
                     if (cartas[i].getPinta() == pinta && cartas[i].getNombre() == nombre) {
-                        contador++;
+                        cartasEnEscalera[nombre.ordinal()] = true;
                     }
                 }
-
-                if (contador >= 1) {
-
-                    cartasEnEscalera[nombre.ordinal()] = true;             
-                }
-
-                if (nombre == NombreCarta.AS || nombre == NombreCarta.JACK || nombre == NombreCarta.QUEEN || nombre == NombreCarta.KING) {
-                    puntajeARestar += puntajeARestar + 10;
+            }
+    
+            for (int i = 0; i < cartasEnEscalera.length; i++) {
+                if (cartasEnEscalera[i]) {
+                    if (escaleraActual.isEmpty()) {
+                        escaleraActual = NombreCarta.values()[i].name();
+                    } else {
+                        escaleraActual += ", " + NombreCarta.values()[i].name();
+                    }
                 } else {
-                    puntajeARestar += puntajeARestar + nombre.ordinal() + 1;
-                }   
-            }
-
-            for (int i = 1; i <= cartasEnEscalera.length - 4; i++) {
-                if (cartasEnEscalera[i] && cartasEnEscalera[i + 1] && cartasEnEscalera[i + 2] && cartasEnEscalera[i + 3]) {
-                    escaleraEncontrada = true;
-                    mensaje += "Pinta " + pinta.name() + ": " + 
-                                NombreCarta.values()[i] + ", " + 
-                                NombreCarta.values()[i + 1] + ", " + 
-                                NombreCarta.values()[i + 2] + ", " + 
-                                NombreCarta.values()[i + 3] + "\n";
-            
-                    i += 3; // Saltamos las cartas ya contadas en la escalera
+                    if (!escaleraActual.isEmpty() && escaleraActual.contains(",")) {
+                        mensaje += "Pinta " + pinta.name() + ": " + escaleraActual + "\n";
+                        escaleraEncontrada = true;
+                    }
+                    escaleraActual = "";
                 }
             }
-            
-
+    
+            if (!escaleraActual.isEmpty() && escaleraActual.contains(",")) {
+                mensaje += "Pinta " + pinta.name() + ": " + escaleraActual + "\n";
+                escaleraEncontrada = true;
+            }
+    
             if (!escaleraEncontrada) {
                 mensaje += "No hay escaleras en la pinta " + pinta.name() + "\n";
             }
         }
-
-        return mensaje;
-    }
-
-
-    public int calcularPuntaje() {
-        int puntaje = 0;
-        int cantidadVerificaciones = 0;
-        for (int i = 0; i < TOTAL_CARTAS; i++) {
-            NombreCarta nombre = cartas[i].getNombre();
-            
-            if (nombre == NombreCarta.AS || nombre == NombreCarta.JACK || nombre == NombreCarta.QUEEN || nombre == NombreCarta.KING) {
-                puntaje += 10;
-            } else {
-                puntaje += nombre.ordinal() + 1;
+    
+        puntajeTotal = 0;
+        for (int i = 0; i < 10; i++) {
+            if (!perteneceAEscalera(cartas[i])) {
+                puntajeTotal += calcularPuntaje(cartas[i].getNombre());
             }
         }
-
-        if (cantidadVerificaciones == 1) {
-            puntaje = puntaje + puntajeARestar;
+    
+        mensaje += "\nPuntaje de las cartas restantes: " + puntajeTotal;
+        return mensaje;
+    }
+    
+    private boolean perteneceAEscalera(Carta carta) {
+        for (Pinta pinta : Pinta.values()) {
+            boolean[] cartasEnEscalera = new boolean[NombreCarta.values().length];
+    
+            for (NombreCarta nombre : NombreCarta.values()) {
+                for (int i = 0; i < 10; i++) {
+                    if (cartas[i].getPinta() == pinta && cartas[i].getNombre() == nombre) {
+                        cartasEnEscalera[nombre.ordinal()] = true;
+                    }
+                }
+            }
+    
+            for (int i = 0; i < cartasEnEscalera.length - 1; i++) {
+                if (cartasEnEscalera[i] && cartasEnEscalera[i + 1]) {
+                    if (carta.getPinta() == pinta &&
+                            (carta.getNombre().ordinal() == i || carta.getNombre().ordinal() == i + 1)) {
+                        return true;
+                    }
+                }
+            }
         }
-
-        return puntaje;
+        return false;
+    }
+    
+    private int calcularPuntaje(NombreCarta nombre) {
+        if (nombre == NombreCarta.AS || nombre == NombreCarta.JACK || nombre == NombreCarta.QUEEN || nombre == NombreCarta.KING) {
+            return 10;
+        } else {
+            return nombre.ordinal() + 1;
+        }
     }
     
 }
